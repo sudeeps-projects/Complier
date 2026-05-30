@@ -1,5 +1,9 @@
-#include "assembler.h";
+#include "assembler.h"
 
+// can store up to 50 labels
+Label labels[50];
+int labelCount = 0;
+int findLabel(string labelName);
 
 
 void CPU::init() {
@@ -17,24 +21,54 @@ void CPU::run() {
 		switch (ram[pc]) {
 		case LDA:
 			regA = ram[pc + 1];
+			setZeroFlag(regA);
 			pc = pc + 2;
 			break;
 		case LDB:
 			regB = ram[pc + 1];
 			pc = pc + 2;
 			break;
+		case LDM:
+			regA = ram[ram[pc + 1]];
+			setZeroFlag(regA);
+			pc = pc + 2;
+			break;
+		case STA:
+			ram[ram[pc + 1]] = regA;
+			pc = pc + 2;
+			break;
 		case ADD:
-			regA = regA + regB;
+			uint16_t sum;
+			sum = regA + regB;
+			if (sum > 255) {
+				carry_flag = true;
+			}
+			setZeroFlag(regA);
 			pc++;
 			break;
 		case SUB:
+			
+			if (regA < regB) {
+				carry_flag = true;
+			}
 			regA = regA - regB;
+			setZeroFlag(regA);
 			pc++;
 			break;
 		case OUT:
-			cout << regA;
+			cout << static_cast<int>(regA);
 			pc++;
 			break;
+		case JNZ:
+			setZeroFlag(regA);
+			if (zero_flag != true) {
+				pc = ram[pc + 1];
+				break;
+			}
+			else {
+				pc = pc + 2;
+				break;
+			}
 		case HLT:
 		default:
 			hlt = true;
@@ -87,32 +121,73 @@ void CPU::writeMemory(string str) {
 		ram[memIndx++] = static_cast<uint8_t>(value);
 	}
 	else if (instruction == "ADD") {
-		ram[memIndx++] = 2;
+		ram[memIndx++] = ADD;
 	}
 	else if (instruction == "SUB") {
-		ram[memIndx++] = 3;
+		ram[memIndx++] = SUB;
 	}
 	else if (instruction == "STA") {
 		ss >> value;
-		ram[value] = regA;
+		ram[memIndx++] = STA;
+		ram[memIndx++] = static_cast<uint8_t>(value);
+		
 		// TODO error checking above or below ram size
 	}
 	else if (instruction == "LDM") {
 		ss >> value;
-		regA = ram[value];
+		ram[memIndx++] = LDM;
+		ram[memIndx++] = static_cast<uint8_t>(value);
+
 	}
 	else if (instruction == "HLT") {
-		ram[memIndx++] = 4;
+		ram[memIndx++] = HLT;
 	}
 	else if (instruction == "OUT") {
 		ram[memIndx++] = OUT;
+	} 
+	else if (instruction == "JNZ") {
+		ram[memIndx++] = JNZ;
+		string labelName;
+
+		ss >> labelName;
+
+		if (isdigit(labelName[0])) {
+			ram[memIndx++] = stoi(labelName);
+		}
+		else {
+			ram[memIndx++] = findLabel(labelName);
+		}
+
 	}
 	
 	else {
-		ram[memIndx++] = 99;
-		cerr << "Bad Instruction!" << endl;
+		ss >> instruction;
+		labels[labelCount].name = instruction;
+		labels[labelCount].address = memIndx;
+		labelCount++;
 	}
 	
 
 	
+}
+
+
+int findLabel(string labelName) {
+	for (int i = 0; i < labelCount; i++) {
+		if (labels[i].name == labelName) {
+			return labels[i].address;
+		}
+		else {
+			return -1;
+		}
+	}
+}
+
+void CPU::setZeroFlag(uint8_t reg) {
+	if (reg == 0) {
+		zero_flag = true;
+	}
+	else {
+		zero_flag = false;
+	}
 }

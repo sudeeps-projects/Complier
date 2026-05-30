@@ -20,8 +20,13 @@ public:
 	uint8_t readMemory(uint8_t address);
 	void writeMemory(uint8_t address, uint8_t value);
 	void writeMemory(string str);
+	void setZeroFlag(uint8_t reg);
 
+};
 
+struct Label {
+	int address;
+	string name;
 };
 
 enum oppCode {
