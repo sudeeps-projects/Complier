@@ -1,0 +1,14 @@
+LDA 5
+
+STA 100
+loop
+
+LDM 100
+OUT
+
+LDB 1
+SUB
+
+STA 100
+JNZ loop
+HLT
