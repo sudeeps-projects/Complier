@@ -1,4 +1,4 @@
-# Compiler
+# Minerva-8
 
 This project is the demonstration of how a 8-bit CPU actually works in computers. In this project, there has been created an assembler which parses lines from memory (RAM) and generates byte code that is read by the computer. An assembler language serves as the go-between from RAM to byte code. 
 
