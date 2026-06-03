@@ -1,4 +1,5 @@
 #include "assembler.h"
+#include <iomanip>;
 
 // can store up to 50 labels
 Label labels[50];
@@ -38,12 +39,13 @@ void CPU::run() {
 			pc = pc + 2;
 			break;
 		case ADD:
-			uint16_t sum;
+			int sum;
 			sum = regA + regB;
 			if (sum > 255) {
 				carry_flag = true;
 			}
 			setZeroFlag(regA);
+			regA = sum;
 			pc++;
 			break;
 		case SUB:
@@ -56,7 +58,15 @@ void CPU::run() {
 			pc++;
 			break;
 		case OUT:
-			cout << static_cast<int>(regA);
+	
+			if (regA > 14) { 
+				cout  << static_cast<int>(regA);
+
+			}
+			else {
+			
+				cout  << regA;
+			}
 			pc++;
 			break;
 		case JNZ:
@@ -102,7 +112,7 @@ void CPU::print_CPU_state() {
 	<< " CF; " << carry_flag
 		<< " ZF; " << zero_flag
 		<< "ram @ pc" << static_cast<int>(ram[pc]) 
-		<< "Memory Index" << static_cast<int>(memIndx) << endl;
+		<< "Memory Index" << static_cast<int>(memIndx) << endl << "\n";
 
 
 }
@@ -231,5 +241,20 @@ void CPU::setZeroFlag(uint8_t reg) {
 	}
 	else {
 		zero_flag = false;
+	}
+}
+
+uint8_t CPU::getMemIndx() {
+	return memIndx;
+}
+
+
+void CPU::printRam() {
+	uint8_t x = 0;
+	cout << "Address \t" << " Value" << endl;
+	while (x < memIndx) {
+		
+		cout << setw(4) << setfill('0') << static_cast<int>(x) << "\t \t " << static_cast<int>(ram[x]) << "\n";
+		x++;
 	}
 }

@@ -1,5 +1,6 @@
-#include "assembler.h";
-#include <fstream>;
+#include "assembler.h"
+#include <fstream>
+#include <iomanip>
 /*
 LDA 5
 STA 100
@@ -18,19 +19,26 @@ JNZ loop
 
 HLT*/
 int main() {
-	cout << "Hello World" << endl;
-	cout << ".";
+	cout << "Welcome to MINERVA-8 (MINIMUM RISC-V ALTERNATE ASSEMBLY LANGUAGE)" << endl;
 	CPU cpu;
 	cpu.init();
 	cpu.print_CPU_state();
-
-	ifstream file("asm1.asm");
+	
+	ifstream file("sum.asm");
 	string line;
+	cout << "ASSEMBLY FILE READ FROM USER \n";
+	cout << "--------------------------- \n \n";
 	while (getline(file >> ws, line)) {
+		if (line[0] == ';') {
+			continue;
+		}
+		cout << setw(4) << setfill('0') << static_cast<int>(cpu.getMemIndx()) << " " << line << endl;
 		cpu.writeMemory(line);
+		
 	}
-
-
+	cout << "\nData in memory\n" ;
+	cout << "------------------\n";
+	cpu.printRam();
 	/*cpu.writeMemory("LDA 5");
 	cpu.writeMemory("STA 100");
 	cpu.writeMemory("loop");

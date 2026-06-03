@@ -21,6 +21,8 @@ public:
 	void writeMemory(uint8_t address, uint8_t value);
 	void writeMemory(string str);
 	void setZeroFlag(uint8_t reg);
+	void printRam();
+	uint8_t getMemIndx();
 
 };
 
